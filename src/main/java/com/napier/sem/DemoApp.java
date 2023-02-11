@@ -1,7 +1,11 @@
 package com.napier.sem;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.*;
 import java.util.ArrayList;
+
 public class DemoApp
 {
     public static void main(String[] args)
@@ -11,19 +15,17 @@ public class DemoApp
         DemoApp a = new DemoApp();
 
         // Connect to database
-        a.connect();
+        //a.connect();
 
-        // Extract employee salary information
-        ArrayList<Country> countries = a.getCountries();
+        // Display Menu
+        MenuMain menuMain = new MenuMain();
+        menuMain.run();
 
-        // Test the size of the returned data - should be 240124
-        System.out.println(countries.size());
-
-        // Display
-        a.printCountries(countries);
+        System.out.println("Exiting Program...");
+        //System.exit(0);
 
         // Disconnect from database
-        a.disconnect();
+        //a.disconnect();
     }
 
     /**
@@ -44,17 +46,19 @@ public class DemoApp
         catch (ClassNotFoundException e)
         {
             System.out.println("Could not load SQL driver");
-            System.exit(-1);
+            System.out.println("Continuing without db ...");
+            return;
+            //System.exit(-1);
         }
 
-        int retries = 10;
+        int retries = 1;
         for (int i = 0; i < retries; ++i)
         {
             System.out.println("Connecting to database...");
             try
             {
                 // Wait a bit for db to start
-                Thread.sleep(30000);
+                Thread.sleep(10000);
                 // Connect to database
                 con = DriverManager.getConnection("jdbc:mysql://db:3306/world?useSSL=false", "root", "example");
                 System.out.println("Successfully connected");
@@ -91,59 +95,16 @@ public class DemoApp
         }
     }
 
-    /**
-     * Gets all the countries
-     * @return A list of all countries.
-     */
-    public ArrayList<Country> getCountries()
-    {
-        try
-        {
-            // Create an SQL statement
-            Statement stmt = con.createStatement();
-            // Create string for SQL statement
-            String strSelect =
-                    "SELECT Code, Name, Continent, Population "
-                            + "FROM country "
-                            + "ORDER BY Population DESC";
-            // Execute SQL statement
-            ResultSet rset = stmt.executeQuery(strSelect);
-            // Extract country information
-            ArrayList<Country> countries = new ArrayList<Country>();
-            while (rset.next())
-            {
-                Country country = new Country();
-                country.Code = rset.getString("Code");
-                country.Name = rset.getString("Name");
-                country.Continent = rset.getString("Continent");
-                country.Population = rset.getInt("Population");
-                countries.add(country);
-            }
-            return countries;
-        }
-        catch (Exception e)
-        {
-            System.out.println(e.getMessage());
-            System.out.println("Failed to get country details");
-            return null;
-        }
-    }
 
-    /**
-     * Prints a list of countries.
-     * @param countries The list of countries to print.
-     */
-    public void printCountries(ArrayList<Country> countries)
-    {
-        // Print header
-        System.out.println(String.format("%-10s %-30s %-30s %-20s", "Code", "Name", "Continent", "Population"));
-        // Loop over all countries in the list
-        for (Country country : countries)
-        {
-            String country_string =
-                    String.format("%-10s %-30s %-30s %-20s",
-                            country.Code, country.Name, country.Continent, country.Population);
-            System.out.println(country_string);
-        }
+
+    public static void cls(){
+        try {
+
+            if (System.getProperty("os.name").contains("Windows"))
+                new ProcessBuilder("cmd", "/c",
+                        "cls").inheritIO().start().waitFor();
+            else
+                Runtime.getRuntime().exec("clear");
+        } catch (IOException | InterruptedException ex) {}
     }
 }
