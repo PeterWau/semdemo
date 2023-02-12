@@ -135,11 +135,20 @@ public class DemoApp
      */
     public void printCountries(ArrayList<Country> countries)
     {
+        // Check employees is not null
+        if (countries == null)
+        {
+            System.out.println("No countries");
+            return;
+        }
+
         // Print header
         System.out.println(String.format("%-10s %-30s %-30s %-20s", "Code", "Name", "Continent", "Population"));
         // Loop over all countries in the list
         for (Country country : countries)
         {
+            if (country == null)
+                continue;
             String country_string =
                     String.format("%-10s %-30s %-30s %-20s",
                             country.Code, country.Name, country.Continent, country.Population);
